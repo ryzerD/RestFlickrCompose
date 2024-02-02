@@ -28,5 +28,16 @@ class RepositoryImpl @Inject constructor(
         throw Exception("Failed to fetch photos")
     }
 
+    override suspend fun getMorePhotos(page: Int): FlickrDomain {
+        val response = service.getMorePhotos(page)
+        if (response.isSuccessful) {
+            val flickrResponse = response.body()
+            if (flickrResponse != null) {
+                return flickrResponse.toDomain()
+            }
+        }
+        throw Exception("Failed to fetch photos")
+    }
+
 
 }

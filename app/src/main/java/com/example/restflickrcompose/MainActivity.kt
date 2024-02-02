@@ -10,7 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.example.restflickrcompose.screens.viewerImage.ViewerScreen
-import com.example.restflickrcompose.screens.viewerImage.viewerViewModel
+import com.example.restflickrcompose.screens.viewerImage.ViewerViewModel
 import com.example.restflickrcompose.ui.theme.RestFlickrComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.async
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val viewerViewModel: viewerViewModel by viewModels()
+    private val viewerViewModel: ViewerViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

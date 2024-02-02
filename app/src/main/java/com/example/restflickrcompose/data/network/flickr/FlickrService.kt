@@ -36,4 +36,28 @@ class FlickrService @Inject constructor(
             Response.error(400, ResponseBody.create(null, "Error desconocido: ${e.message}"))
         }
     }
+
+    suspend fun getMorePhotos(page: Int): Response<FlickrResponse> {
+        return try {
+            flickrClient.getMorePhotos(page)
+        } catch (e: IOException) {
+            // Maneja errores de red
+            Log.e("ApiAdminService", "Error de red", e)
+            Response.error(400, ResponseBody.create(null, "Error de red: ${e.message}"))
+        } catch (e: HttpException) {
+            // Maneja respuestas no exitosas de la API
+            Log.e("ApiAdminService", "Respuesta no exitosa de la API", e)
+            Response.error(
+                e.code(),
+                e.response()?.errorBody() ?: ResponseBody.create(
+                    null,
+                    "Respuesta no exitosa de la API"
+                )
+            )
+        } catch (e: Exception) {
+            // Maneja cualquier otra excepción
+            Log.e("ApiAdminService", "Error desconocido", e)
+            Response.error(400, ResponseBody.create(null, "Error desconocido: ${e.message}"))
+        }
+    }
 }
