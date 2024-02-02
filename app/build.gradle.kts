@@ -1,8 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id ("kotlin-kapt")
-    id ("dagger.hilt.android.plugin")
+    id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -50,7 +50,7 @@ android {
         }
     }
     kapt {
-        correctErrorTypes  = true
+        correctErrorTypes = true
     }
 }
 
@@ -85,5 +85,18 @@ dependencies {
     //dagger
     implementation("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-android-compiler:2.48")
+
+    // Glide
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
+
+    //LiveData
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.0")
+
+    //Corrutinas
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation ("androidx.arch.core:core-testing:2.2.0")
+
 
 }
