@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.restflickrcompose.domain.model.PhotoObtain
-import com.example.restflickrcompose.domain.useCases.FlickrApi.GetMorePhotos
+import com.example.restflickrcompose.domain.useCases.FlickrApi.GetMorePhotosUseCase
 import com.example.restflickrcompose.domain.useCases.FlickrApi.GetPhotosUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ViewerViewModel @Inject constructor(
     private val getPhotosUseCase: GetPhotosUseCase,
-    private val getMorePhotos: GetMorePhotos
+    private val getMorePhotos: GetMorePhotosUseCase
 ) : ViewModel() {
 
     private val _photosList = MutableLiveData<PhotoState>()

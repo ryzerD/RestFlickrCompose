@@ -5,7 +5,7 @@ import com.example.restflickrcompose.domain.model.FlickrDomain
 import com.example.restflickrcompose.domain.repository.Repository
 import javax.inject.Inject
 
-class GetMorePhotos @Inject constructor(
+class GetMorePhotosUseCase @Inject constructor(
     private val repository: Repository
 ) {
     suspend operator fun invoke(page: Int): FlickrDomain? {
