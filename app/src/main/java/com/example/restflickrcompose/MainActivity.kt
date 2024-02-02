@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(Routes.Screen2.route) { backStackEntry ->
                             val photoObtain = backStackEntry.arguments?.getString("photo")
-                            DetailPhoto(navigationController, photoObtain)
+                            DetailPhoto(navigationController, photoObtain, viewerViewModel)
                         }
                     }
 

@@ -54,12 +54,23 @@ class ViewerViewModel @Inject constructor(
                     )
                 } ?: emptyList()
 
-                val currentPhotosList = (_photosList.value as? PhotoState.Success)?.photoState ?: emptyList()
+                val currentPhotosList =
+                    (_photosList.value as? PhotoState.Success)?.photoState ?: emptyList()
                 val updatedPhotosList = currentPhotosList + newPhotosList
                 _photosList.postValue(PhotoState.Success(updatedPhotosList))
             } catch (e: Exception) {
                 // Manejo de errores...
             }
+        }
+    }
+
+    fun filterPhotosById(id: String): PhotoObtain? {
+        val photoState = _photosList.value
+
+        return if (photoState is PhotoState.Success) {
+            photoState.photoState.find { photo -> photo.id == id }
+        } else {
+            null
         }
     }
 }
