@@ -1,8 +1,8 @@
-package com.example.restflickrcompose.data.network.flickr.model
+package com.example.restflickrcompose.domain.model
 
-import com.example.restflickrcompose.domain.model.PhotoDomain
+import com.example.restflickrcompose.data.network.flickr.model.Photo
 
-data class Photo(
+data class PhotoDomain(
     val farm: Int,
     val id: String,
     val isfamily: Int,
@@ -14,7 +14,7 @@ data class Photo(
     val title: String
 )
 
-fun PhotoDomain.toDatabase() = Photo(
+fun Photo.toDomainCategories() = PhotoDomain(
     farm = farm,
     id = id,
     isfamily = isfamily,
