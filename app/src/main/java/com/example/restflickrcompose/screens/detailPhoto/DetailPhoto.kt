@@ -11,8 +11,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -37,7 +40,7 @@ fun DetailPhoto(
 fun Body(photo: PhotoObtain) {
     Card(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(16.dp).fillMaxWidth()
     ) {
         AsyncImage(
             model = photo.url,
@@ -45,9 +48,9 @@ fun Body(photo: PhotoObtain) {
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Fit
         )
-        Text(text = photo.title)
+        Text(text = photo.title, fontWeight = FontWeight.Bold)
     }
 }
 

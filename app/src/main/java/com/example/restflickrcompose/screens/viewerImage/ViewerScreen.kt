@@ -11,17 +11,27 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.Coil
+import coil.ImageLoader
 import coil.compose.AsyncImage
+import coil.memory.MemoryCache
 import com.example.restflickrcompose.domain.model.PhotoObtain
 import com.example.restflickrcompose.screens.routes.Routes
 
@@ -29,9 +39,10 @@ import com.example.restflickrcompose.screens.routes.Routes
 @Composable
 fun ViewerScreen(
     viewerViewModel: ViewerViewModel = viewModel(),
-    navigationController: NavHostController
+    navigationController: NavHostController,
 ) {
     val photosState by viewerViewModel.photosList.observeAsState()
+
 
     when (photosState) {
         is PhotoState.Loading -> DisplayLoadingState()
@@ -44,29 +55,73 @@ fun ViewerScreen(
         is PhotoState.Error -> DisplayErrorState()
         else -> {}
     }
+
+    DisplaySnackbar(viewerViewModel)
+}
+
+@Composable
+fun ImageCard(photo: PhotoObtain, onItemSelected: (String) -> Unit) {
+    Card(modifier = Modifier
+        .padding(16.dp)
+        .clickable {
+            onItemSelected(photo.id)
+        }) {
+        ImageItem(photo)
+        TextItem(photo)
+    }
 }
 
 
 @Composable
-fun ImageItem(photo: PhotoObtain, onItemSelected: (String) -> Unit) {
-    Card(modifier = Modifier
-        .padding(16.dp)
-        .clickable {
-            onItemSelected(
-                photo.id
-            )
-        }) {
-        AsyncImage(
-            model = photo.url,
-            contentDescription = "Image from Flickr",
-            modifier = Modifier
-                .width(200.dp)
-                .height(200.dp),
-            contentScale = ContentScale.Crop
+fun DisplaySnackbar(viewerViewModel: ViewerViewModel) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val isNetworkAvailable by viewerViewModel.networkMonitor.isNetworkAvailable.collectAsState()
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Your content here
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
         )
-        Text(text = photo.title)
     }
 
+    LaunchedEffect(key1 = isNetworkAvailable) {
+        if (!isNetworkAvailable) {
+            snackbarHostState.showSnackbar(
+                message = "Algo no esta iendo bien con tu conexion a internet, no te preocupes intentaremos de nuevo",
+                actionLabel = "Dismiss",
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
+}
+
+
+
+@Composable
+fun ImageItem(photo: PhotoObtain) {
+    val context = LocalContext.current
+    val imageLoader = ImageLoader.Builder(context)
+        .memoryCache {
+            MemoryCache.Builder(context).maxSizePercent(0.25).build()
+        } // Use 25% of the application's available memory.
+        .crossfade(true) // Show a crossfade when loading images.
+        .build()
+    Coil.setImageLoader(imageLoader)
+    AsyncImage(
+        model = photo.url,
+        contentDescription = "Image from Flickr",
+        modifier = Modifier
+            .width(200.dp)
+            .height(200.dp),
+        contentScale = ContentScale.Crop
+    )
+}
+
+@Composable
+fun TextItem(photo: PhotoObtain) {
+    Text(text = photo.title, maxLines = 2, modifier = Modifier.padding(8.dp))
 }
 
 
@@ -87,7 +142,7 @@ fun DisplaySuccessState(
     val photosList = photoState.photoState
     LazyVerticalGrid(columns = GridCells.Fixed(2), content = {
         itemsIndexed(photosList) { index, photo ->
-            ImageItem(photo) { item ->
+            ImageCard(photo) { item ->
                 navigationController.navigate(Routes.Screen2.createRoute(item))
             }
             if (index == photosList.lastIndex - 10) {

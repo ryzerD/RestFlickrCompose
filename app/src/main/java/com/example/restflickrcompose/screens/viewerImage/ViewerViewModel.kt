@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.restflickrcompose.NetworkMonitor
 import com.example.restflickrcompose.domain.model.PhotoObtain
 import com.example.restflickrcompose.domain.useCases.FlickrApi.GetMorePhotosUseCase
 import com.example.restflickrcompose.domain.useCases.FlickrApi.GetPhotosUseCase
@@ -14,12 +15,14 @@ import javax.inject.Inject
 @HiltViewModel
 class ViewerViewModel @Inject constructor(
     private val getPhotosUseCase: GetPhotosUseCase,
-    private val getMorePhotos: GetMorePhotosUseCase
+    private val getMorePhotos: GetMorePhotosUseCase,
+    val networkMonitor: NetworkMonitor
 ) : ViewModel() {
 
     private val _photosList = MutableLiveData<PhotoState>()
     val photosList: LiveData<PhotoState> get() = _photosList
 
+    val isNetworkAvailable = networkMonitor.isNetworkAvailable
 
     fun getPhotos() {
         viewModelScope.launch {

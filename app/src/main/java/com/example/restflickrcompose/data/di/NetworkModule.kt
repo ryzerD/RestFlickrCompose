@@ -1,5 +1,6 @@
 package com.example.restflickrcompose.data.di
 
+import android.content.Context
 import com.example.restflickrcompose.data.network.flickr.FlickrClient
 import com.example.restflickrcompose.data.network.flickr.FlickrService
 import com.example.restflickrcompose.data.repositoryImpl.RepositoryImpl
@@ -7,6 +8,7 @@ import com.example.restflickrcompose.domain.repository.Repository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -37,4 +39,11 @@ object NetworkModule {
         return retrofit.create(FlickrClient::class.java)
     }
 
+
+
+    @Provides
+    @Singleton
+    fun provideContext(@ApplicationContext context: Context): Context {
+        return context
+    }
 }
