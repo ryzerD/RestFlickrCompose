@@ -10,8 +10,7 @@ class GetMorePhotosUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(page: Int): FlickrDomain? {
         val photos = repository.getMorePhotos(page)
-        if (photos.photos.photo.isNotEmpty()) {
-            Log.d("GetMorePhotos", "MAS")
+        if (photos != null) {
             return photos
         }
         return null

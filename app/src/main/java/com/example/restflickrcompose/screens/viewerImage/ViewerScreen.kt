@@ -20,7 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -43,11 +43,20 @@ fun ViewerScreen(
 ) {
     val photosState by viewerViewModel.photosList.observeAsState()
 
+    ViewerContent(photosState, viewerViewModel, navigationController)
+    DisplaySnackbar(viewerViewModel)
+}
 
+@Composable
+fun ViewerContent(
+    photosState: PhotoState?,
+    viewerViewModel: ViewerViewModel,
+    navigationController: NavHostController
+) {
     when (photosState) {
         is PhotoState.Loading -> DisplayLoadingState()
         is PhotoState.Success -> DisplaySuccessState(
-            photosState as PhotoState.Success,
+            photosState,
             viewerViewModel,
             navigationController
         )
@@ -55,8 +64,6 @@ fun ViewerScreen(
         is PhotoState.Error -> DisplayErrorState()
         else -> {}
     }
-
-    DisplaySnackbar(viewerViewModel)
 }
 
 @Composable
@@ -74,20 +81,18 @@ fun ImageCard(photo: PhotoObtain, onItemSelected: (String) -> Unit) {
 
 @Composable
 fun DisplaySnackbar(viewerViewModel: ViewerViewModel) {
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = rememberSaveable { SnackbarHostState() }
     val isNetworkAvailable by viewerViewModel.networkMonitor.isNetworkAvailable.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Your content here
-
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
     }
 
-    LaunchedEffect(key1 = isNetworkAvailable) {
-        if (!isNetworkAvailable) {
+    if (!isNetworkAvailable) {
+        LaunchedEffect(key1 = snackbarHostState) {
             snackbarHostState.showSnackbar(
                 message = "Algo no esta iendo bien con tu conexion a internet, no te preocupes intentaremos de nuevo",
                 actionLabel = "Dismiss",
@@ -96,8 +101,6 @@ fun DisplaySnackbar(viewerViewModel: ViewerViewModel) {
         }
     }
 }
-
-
 
 @Composable
 fun ImageItem(photo: PhotoObtain) {
