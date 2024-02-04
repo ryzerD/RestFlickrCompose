@@ -10,4 +10,5 @@ interface Repository {
     suspend fun insertPhotos(photoObtain: List<PhotoEntity>)
 
     suspend fun getPhotosFromDb(): List<PhotoEntity>
+    suspend fun getPhotoById(id:String): PhotoEntity?
 }

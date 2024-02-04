@@ -69,7 +69,7 @@ fun ViewerContent(
             navigationController
         )
 
-        is PhotoState.Error -> DisplayErrorState(isNetworkAvailable)
+        is PhotoState.Error -> DisplayErrorState()
         else -> {}
     }
 }
@@ -170,9 +170,8 @@ fun DisplaySuccessState(
 
 
 @Composable
-fun DisplayErrorState(isNetworkAvailable: Boolean) {
-    if (!isNetworkAvailable) {
-        CustomSnackbar("Ha ocurrido un error")
-    }
+fun DisplayErrorState() {
+    CustomSnackbar("Ha ocurrido un error")
+
 }
 

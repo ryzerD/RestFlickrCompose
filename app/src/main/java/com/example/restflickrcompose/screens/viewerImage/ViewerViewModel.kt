@@ -51,15 +51,7 @@ class ViewerViewModel @Inject constructor(
         }
     }
 
-    fun filterPhotosById(id: String): PhotoObtain? {
-        val photoState = _photosList.value
 
-        return if (photoState is PhotoState.Success) {
-            photoState.photoState.find { photo -> photo.id == id }
-        } else {
-            null
-        }
-    }
 
     // This function is for testing purposes only
     fun setPhotosListForTesting(photoState: PhotoState) {

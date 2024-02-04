@@ -14,4 +14,7 @@ interface PhotoDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(photos: List<PhotoEntity>)
+
+    @Query("SELECT * FROM photos WHERE id = :photoId")
+    fun getPhotoById(photoId: String): PhotoEntity
 }

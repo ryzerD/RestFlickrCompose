@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.restflickrcompose.screens.detailPhoto.DetailPhoto
+import com.example.restflickrcompose.screens.detailPhoto.DetailViewModel
 import com.example.restflickrcompose.screens.routes.Routes
 import com.example.restflickrcompose.screens.viewerImage.ViewerScreen
 import com.example.restflickrcompose.screens.viewerImage.ViewerViewModel
@@ -26,6 +27,8 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewerViewModel: ViewerViewModel by viewModels()
+    private val detailViewModel: DetailViewModel by viewModels()
+
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,7 +60,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(Routes.Screen2.route) { backStackEntry ->
                             val photoObtain = backStackEntry.arguments?.getString("photo")
-                            DetailPhoto(navigationController, photoObtain, viewerViewModel)
+                            DetailPhoto(navigationController, photoObtain, detailViewModel)
                         }
                     }
 

@@ -82,5 +82,17 @@ class RepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getPhotoById(id: String): PhotoEntity? {
+        return try {
+            dao.getPhotoById(id)
+        } catch (e: Exception) {
+            // Maneja el error aquí. Podrías registrar el error, mostrar un mensaje al usuario, etc.
+            // Por ahora, simplemente vamos a imprimir el error y devolver una lista vacía.
+            Log.e("getCategories", "Error al obtener Categorias", e)
+            e.printStackTrace()
+           null
+        }
+    }
+
 
 }
