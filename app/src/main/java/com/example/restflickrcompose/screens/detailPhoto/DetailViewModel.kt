@@ -1,6 +1,5 @@
 package com.example.restflickrcompose.screens.detailPhoto
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -22,16 +21,16 @@ class DetailViewModel @Inject constructor(
     val photosList: LiveData<PhotoDetailState> get() = _photosList
 
 
-    fun filterPhotosById(id: String): PhotoObtain? {
-        Log.d("DetailViewModel", "filterPhotosById: $id")
-
-        val result: PhotoObtain? = null
+    fun filterPhotosById(id: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val photoState = async { getPhotoByID(id) }
-            Log.d("DetailViewModel", "filterPhotosById: $photoState")
-            _photosList.postValue(photoState.await()?.let { PhotoDetailState.Success(it) })
+            try {
+                val photoState = async { getPhotoByID(id) }
+                val result = photoState.await()
+                _photosList.postValue(result?.let { PhotoDetailState.Success(it) })
+            } catch (e: Exception) {
+                _photosList.postValue(PhotoDetailState.Error(e.message ?: "Unknown error"))
+            }
         }
-        return result
     }
 }
 
