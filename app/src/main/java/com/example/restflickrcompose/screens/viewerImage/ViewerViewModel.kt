@@ -25,21 +25,21 @@ class ViewerViewModel @Inject constructor(
 
 
     fun getPhotos() {
-        viewModelScope.launch (Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _photosList.postValue(PhotoState.Loading)
             try {
-                _photosList.postValue(PhotoState.Loading)
                 val searchResponse = getPhotosUseCase()
                 _photosList.postValue(PhotoState.Success(searchResponse))
             } catch (e: Exception) {
                 _photosList.postValue(PhotoState.Error(e.message ?: "Unknown error"))
+                return@launch
             }
         }
     }
 
     fun loadMorePhotos(page: Int) {
-        viewModelScope.launch (Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                _photosList.postValue(PhotoState.Loading)
                 val searchResponse = getMorePhotos(page)
                 val currentPhotosList =
                     (_photosList.value as? PhotoState.Success)?.photoState ?: emptyList()
@@ -59,6 +59,11 @@ class ViewerViewModel @Inject constructor(
         } else {
             null
         }
+    }
+
+    // This function is for testing purposes only
+    fun setPhotosListForTesting(photoState: PhotoState) {
+        _photosList.value = photoState
     }
 }
 

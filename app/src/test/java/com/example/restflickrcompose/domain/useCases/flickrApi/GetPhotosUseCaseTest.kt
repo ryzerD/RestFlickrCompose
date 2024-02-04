@@ -13,7 +13,8 @@ import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.MockitoAnnotations
@@ -50,11 +51,8 @@ class GetPhotosUseCaseTest {
 
 
     @Test
-    fun `invoke returns expected result`() = runBlockingTest {
-        // 1. Crear un objeto simulado (mock) de Repository
-        val repository = mockk<Repository>()
-
-        // 2. Configurar el comportamiento de los métodos en el objeto simulado de Repository
+    fun `invoke returns expected result`() = runTest {
+        //Given
         val expectedPhotos = listOf(
             PhotoObtain(
                 id = "1",
@@ -75,19 +73,37 @@ class GetPhotosUseCaseTest {
         coEvery { repository.getPhotosFromDb() } returns expectedPhotos.map { it.toDatabase() }
         coJustRun { repository.insertPhotos(any()) }
 
-        // 3. Crear una instancia de GetPhotosUseCase pasando el objeto simulado de Repository
-        val getPhotosUseCase = GetPhotosUseCase(repository)
 
-        // 4. Llamar a la función invoke() en la instancia de GetPhotosUseCase
+        //when
         val result = getPhotosUseCase.invoke()
 
-        // 5. Verificar que los métodos en el objeto simulado de Repository se llamaron la cantidad correcta de veces
+        //Then
         coVerify(exactly = 1) { repository.getPhotos() }
         coVerify(exactly = 1) { repository.insertPhotos(any()) }
         coVerify(exactly = 0) { repository.getPhotosFromDb() }
-
-        // 6. Asegurarte de que la función invoke() devuelve el resultado esperado
         assertEquals(expectedPhotos, result)
     }
+
+    @Test
+    fun `getPhotosUseCase throws an exception`() = runTest {
+        // Given
+        val expectedExceptionMessage = "Error al obtener las fotos"
+
+        // Mock the getPhotosUseCase to throw an exception when invoked
+        coEvery { repository.getPhotos() } throws Exception(expectedExceptionMessage)
+
+        // When
+        var actualExceptionMessage: String? = null
+        try {
+            getPhotosUseCase()
+        } catch (e: Exception) {
+            actualExceptionMessage = e.message
+        }
+
+        // Then
+        assertNotNull(actualExceptionMessage)
+        assertEquals(expectedExceptionMessage, actualExceptionMessage)
+    }
+
 
 }

@@ -18,32 +18,45 @@ class RepositoryImpl @Inject constructor(
 ) : Repository {
 
     override suspend fun getPhotos(): FlickrDomain? {
-    return try {
-        service.getPhotos().body()?.toDomain()
-    } catch (e: IOException) {
-        // Handle network errors
-        Log.e("ApiAdminService", "Network error", e)
-        null
-    } catch (e: HttpException) {
-        // Handle unsuccessful API responses
-        Log.e("ApiAdminService", "Unsuccessful API response", e)
-        null
-    } catch (e: Exception) {
-        // Handle any other exceptions
-        Log.e("ApiAdminService", "Unknown error", e)
-        null
+        return try {
+            service.getPhotos().body()?.toDomain()
+        } catch (e: IOException) {
+            // Handle network errors
+            Log.e("ApiAdminService", "Network error", e)
+            null
+        } catch (e: HttpException) {
+            // Handle unsuccessful API responses
+            Log.e("ApiAdminService", "Unsuccessful API response", e)
+            null
+        } catch (e: Exception) {
+            // Handle any other exceptions
+            Log.e("ApiAdminService", "Unknown error", e)
+            null
+        }
     }
-}
 
-    override suspend fun getMorePhotos(page: Int): FlickrDomain {
-        val response = service.getMorePhotos(page)
-        if (response.isSuccessful) {
+    override suspend fun getMorePhotos(page: Int): FlickrDomain? {
+        return try {
+            val response = service.getMorePhotos(page)
+
             val flickrResponse = response.body()
             if (flickrResponse != null) {
                 return flickrResponse.toDomain()
             }
+            null
+        } catch (e: IOException) {
+            // Handle network errors
+            Log.e("ApiAdminService", "Network error", e)
+            null
+        } catch (e: HttpException) {
+            // Handle unsuccessful API responses
+            Log.e("ApiAdminService", "Unsuccessful API response", e)
+            null
+        } catch (e: Exception) {
+            // Handle any other exceptions
+            Log.e("ApiAdminService", "Unknown error", e)
+            null
         }
-        throw Exception("Failed to fetch photos")
     }
 
     override suspend fun insertPhotos(photoObtain: List<PhotoEntity>) {

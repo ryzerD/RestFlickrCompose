@@ -10,22 +10,31 @@ class GetPhotosUseCase @Inject constructor(
     private val repository: Repository
 ) {
     suspend operator fun invoke(): List<PhotoObtain> {
-        val photos = repository.getPhotos()
-        if (photos != null) {
-            val obtain = photos?.photos?.photo?.map { photo ->
-                PhotoObtain(
-                    id = photo.id,
-                    url = "https://farm${photo.farm}.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}.jpg",
-                    title = photo.title,
-                    page = photos.photos.page
-                )
-            } ?: emptyList()
+        try {
+            val photos = repository.getPhotos()
+            if (photos != null) {
+                val obtain = photos?.photos?.photo?.map { photo ->
+                    PhotoObtain(
+                        id = photo.id,
+                        url = "https://farm${photo.farm}.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}.jpg",
+                        title = photo.title,
+                        page = photos.photos.page
+                    )
+                } ?: emptyList()
 
-            val photoEntities = obtain.map { it.toDatabase() }
-            repository.insertPhotos(photoEntities)
+                val photoEntities = obtain.map { it.toDatabase() }
+                repository.insertPhotos(photoEntities)
 
-            return obtain
+                return obtain
+            }
+            return repository.getPhotosFromDb().map { it.toDomain() }
+
+        } catch (e: Exception) {
+            // Aquí puedes manejar la excepción como prefieras.
+            // Por ejemplo, puedes devolver una lista vacía:
+            throw Exception("Error al obtener las fotos")
+            // O puedes lanzar una excepción personalizada:
+
         }
-        return repository.getPhotosFromDb().map { it.toDomain() }
     }
 }

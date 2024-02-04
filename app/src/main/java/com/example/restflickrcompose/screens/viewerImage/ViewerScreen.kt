@@ -1,6 +1,5 @@
 package com.example.restflickrcompose.screens.viewerImage
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +24,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -47,16 +45,21 @@ fun ViewerScreen(
     navigationController: NavHostController,
 ) {
     val photosState by viewerViewModel.photosList.observeAsState()
+    val isNetworkAvailable by viewerViewModel.networkMonitor.isNetworkAvailable.collectAsState()
 
-    ViewerContent(photosState, viewerViewModel, navigationController)
-    DisplaySnackbar(viewerViewModel)
+    ViewerContent(photosState, viewerViewModel, navigationController, isNetworkAvailable)
+
+    if (!isNetworkAvailable) {
+        CustomSnackbar("No hay conexión a internet, pero no te preocupes trataré de cargar las imágenes guardadas en la base de datos.")
+    }
 }
 
 @Composable
 fun ViewerContent(
     photosState: PhotoState?,
     viewerViewModel: ViewerViewModel,
-    navigationController: NavHostController
+    navigationController: NavHostController,
+    isNetworkAvailable: Boolean
 ) {
     when (photosState) {
         is PhotoState.Loading -> DisplayLoadingState()
@@ -66,7 +69,7 @@ fun ViewerContent(
             navigationController
         )
 
-        is PhotoState.Error -> DisplayErrorState()
+        is PhotoState.Error -> DisplayErrorState(isNetworkAvailable)
         else -> {}
     }
 }
@@ -85,9 +88,8 @@ fun ImageCard(photo: PhotoObtain, onItemSelected: (String) -> Unit) {
 
 
 @Composable
-fun DisplaySnackbar(viewerViewModel: ViewerViewModel) {
+fun CustomSnackbar(message: String, actionLabel: String = "Dismiss") {
     val snackbarHostState = remember { SnackbarHostState() }
-    val isNetworkAvailable by viewerViewModel.networkMonitor.isNetworkAvailable.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
         SnackbarHost(
@@ -96,14 +98,12 @@ fun DisplaySnackbar(viewerViewModel: ViewerViewModel) {
         )
     }
 
-    if (!isNetworkAvailable) {
-        LaunchedEffect(key1 = snackbarHostState) {
-            snackbarHostState.showSnackbar(
-                message = "Algo no esta iendo bien con tu conexion a internet, no te preocupes intentaremos de nuevo",
-                actionLabel = "Dismiss",
-                duration = SnackbarDuration.Short
-            )
-        }
+    LaunchedEffect(key1 = snackbarHostState) {
+        snackbarHostState.showSnackbar(
+            message = message,
+            actionLabel = actionLabel,
+            duration = SnackbarDuration.Short
+        )
     }
 }
 
@@ -141,7 +141,7 @@ fun TextItem(photo: PhotoObtain) {
 @Composable
 fun DisplayLoadingState() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column (horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = "Cargando...")
             CircularProgressIndicator()
         }
@@ -161,7 +161,7 @@ fun DisplaySuccessState(
             ImageCard(photo) { item ->
                 navigationController.navigate(Routes.Screen2.createRoute(item))
             }
-            if (index == photosList.lastIndex - 10) {
+            if (index == photosList.lastIndex) {
                 viewerViewModel.loadMorePhotos(photo.page + 1)
             }
         }
@@ -170,7 +170,9 @@ fun DisplaySuccessState(
 
 
 @Composable
-fun DisplayErrorState() {
-    // Mostrar un mensaje de error
+fun DisplayErrorState(isNetworkAvailable: Boolean) {
+    if (!isNetworkAvailable) {
+        CustomSnackbar("Ha ocurrido un error")
+    }
 }
 
