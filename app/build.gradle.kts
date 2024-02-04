@@ -63,7 +63,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material3:material3-android:1.2.0-rc01")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -94,18 +94,23 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.6.0")
 
     //Corrutinas
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    testImplementation ("androidx.arch.core:core-testing:2.2.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
 
     //Navigation Compose
     implementation("androidx.navigation:navigation-compose:2.7.6")
 
 
     //Test Unitarios
-    testImplementation ("io.mockk:mockk:1.12.0")
-    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.2")
-    testImplementation ("junit:junit:4.13.2")
+    testImplementation("io.mockk:mockk:1.12.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.2")
+    testImplementation("junit:junit:4.13.2")
+
+
+    //Room
+    implementation("androidx.room:room-ktx:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
 
 
 }

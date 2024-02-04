@@ -1,6 +1,9 @@
 package com.example.restflickrcompose.data.di
 
 import android.content.Context
+import androidx.room.Room
+import com.example.restflickrcompose.data.database.AppDatabase
+import com.example.restflickrcompose.data.database.dao.PhotoDao
 import com.example.restflickrcompose.data.network.flickr.FlickrClient
 import com.example.restflickrcompose.data.network.flickr.FlickrService
 import com.example.restflickrcompose.data.repositoryImpl.RepositoryImpl
@@ -16,7 +19,26 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object NetworkModule {
+object ProviderModule {
+
+    private val DatabaseName = "AppDatabase"
+
+    /**
+     * Proporciona una instancia de la base de datos de Room.
+     *
+     *      * @param context El contexto de la aplicación.
+     *      * @return Una instancia de [IpharmaDatabase].
+     */
+    @Singleton
+    @Provides
+    fun provideRoom(@ApplicationContext context: Context) =
+        Room.databaseBuilder(context, AppDatabase::class.java, DatabaseName).build()
+
+    @Singleton
+    @Provides
+    fun provideParameterDao(db: AppDatabase) = db.photoDao()
+
+
     @Singleton
     @Provides
     fun provideFlickrRetrofit(): Retrofit {
@@ -30,7 +52,8 @@ object NetworkModule {
     @Provides
     fun provideRepository(
         service: FlickrService,
-    ): Repository = RepositoryImpl(service)
+        dao: PhotoDao
+    ): Repository = RepositoryImpl(service, dao)
 
 
     @Singleton
@@ -38,7 +61,6 @@ object NetworkModule {
     fun provideFlickrClient(retrofit: Retrofit): FlickrClient {
         return retrofit.create(FlickrClient::class.java)
     }
-
 
 
     @Provides

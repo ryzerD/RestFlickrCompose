@@ -6,7 +6,7 @@ data class PhotosDomain(
     val page: Int,
     val pages: Int,
     val perpage: Int,
-    val photo: List<PhotoDomain>,
+    var photo: List<PhotoDomain>,
     val total: Int
 )
 

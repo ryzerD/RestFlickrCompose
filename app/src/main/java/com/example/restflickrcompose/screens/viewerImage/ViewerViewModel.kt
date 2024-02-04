@@ -6,9 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.restflickrcompose.NetworkMonitor
 import com.example.restflickrcompose.domain.model.PhotoObtain
-import com.example.restflickrcompose.domain.useCases.FlickrApi.GetMorePhotosUseCase
-import com.example.restflickrcompose.domain.useCases.FlickrApi.GetPhotosUseCase
+import com.example.restflickrcompose.domain.useCases.flickrApi.GetMorePhotosUseCase
+import com.example.restflickrcompose.domain.useCases.flickrApi.GetPhotosUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,22 +23,13 @@ class ViewerViewModel @Inject constructor(
     private val _photosList = MutableLiveData<PhotoState>()
     val photosList: LiveData<PhotoState> get() = _photosList
 
-    val isNetworkAvailable = networkMonitor.isNetworkAvailable
 
     fun getPhotos() {
-        viewModelScope.launch {
+        viewModelScope.launch (Dispatchers.IO) {
             try {
+                _photosList.postValue(PhotoState.Loading)
                 val searchResponse = getPhotosUseCase()
-                val photosList = searchResponse?.photos?.photo?.map { photo ->
-                    PhotoObtain(
-                        id = photo.id,
-                        url = "https://farm${photo.farm}.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}.jpg",
-                        title = photo.title,
-                        page = searchResponse.photos.page
-
-                    )
-                } ?: emptyList()
-                _photosList.postValue(PhotoState.Success(photosList))
+                _photosList.postValue(PhotoState.Success(searchResponse))
             } catch (e: Exception) {
                 _photosList.postValue(PhotoState.Error(e.message ?: "Unknown error"))
             }
@@ -45,24 +37,16 @@ class ViewerViewModel @Inject constructor(
     }
 
     fun loadMorePhotos(page: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch (Dispatchers.IO){
             try {
+                _photosList.postValue(PhotoState.Loading)
                 val searchResponse = getMorePhotos(page)
-                val newPhotosList = searchResponse?.photos?.photo?.map { photo ->
-                    PhotoObtain(
-                        id = photo.id,
-                        url = "https://farm${photo.farm}.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}.jpg",
-                        title = photo.title,
-                        page = searchResponse.photos.page
-                    )
-                } ?: emptyList()
-
                 val currentPhotosList =
                     (_photosList.value as? PhotoState.Success)?.photoState ?: emptyList()
-                val updatedPhotosList = currentPhotosList + newPhotosList
+                val updatedPhotosList = currentPhotosList + searchResponse
                 _photosList.postValue(PhotoState.Success(updatedPhotosList))
             } catch (e: Exception) {
-                // Manejo de errores...
+                _photosList.postValue(PhotoState.Error(e.message ?: "Unknown error"))
             }
         }
     }

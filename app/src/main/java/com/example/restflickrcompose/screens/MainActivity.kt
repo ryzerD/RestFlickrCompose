@@ -1,4 +1,4 @@
-package com.example.restflickrcompose
+package com.example.restflickrcompose.screens
 
 import android.os.Build
 import android.os.Bundle
