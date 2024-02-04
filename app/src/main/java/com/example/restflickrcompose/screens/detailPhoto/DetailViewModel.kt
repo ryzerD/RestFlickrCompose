@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.restflickrcompose.domain.model.PhotoObtain
-import com.example.restflickrcompose.domain.useCases.database.getPhotoByIDUseCase
+import com.example.restflickrcompose.domain.useCases.database.GetPhotoByIDUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
-    private val getPhotoByID: getPhotoByIDUseCase
+    private val getPhotoByID: GetPhotoByIDUseCase
 ) : ViewModel() {
 
     private val _photosList = MutableLiveData<PhotoDetailState>()
@@ -25,7 +25,7 @@ class DetailViewModel @Inject constructor(
     fun filterPhotosById(id: String): PhotoObtain? {
         Log.d("DetailViewModel", "filterPhotosById: $id")
 
-        var result: PhotoObtain? = null
+        val result: PhotoObtain? = null
         viewModelScope.launch(Dispatchers.IO) {
             val photoState = async { getPhotoByID(id) }
             Log.d("DetailViewModel", "filterPhotosById: $photoState")
